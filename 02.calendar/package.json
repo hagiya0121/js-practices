@@ -12,6 +12,7 @@
   },
   "type": "module",
   "dependencies": {
-    "dayjs": "^1.11.11"
+    "dayjs": "^1.11.11",
+    "minimist": "^1.2.8"
   }
 }
