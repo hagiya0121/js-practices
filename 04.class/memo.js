@@ -15,20 +15,25 @@ rl.on("line", (input) => {
 
 rl.on("close", () => {
   const memo = lines.join("\n");
-  const storage = new MemosStorage();
-  storage.add(memo);
+  const db = new MemoDatabase();
+  db.createTable(() => {
+    db.add(memo);
+  });
 });
 
-class MemosStorage {
+class MemoDatabase {
   constructor() {
     this.db = new sqlite3.Database("./db.sqlite");
-    this.db.run("CREATE TABLE IF NOT EXISTS memos (content TEXT)");
+  }
+
+  createTable(callback) {
+    this.db.run("CREATE TABLE IF NOT EXISTS memos (content TEXT)", () => {
+      callback();
+    });
   }
 
   add(memo) {
-    this.db.serialize(() => {
-      const statement = this.db.prepare("INSERT INTO memos VALUES (?)");
-      statement.run(memo).finalize();
-    });
+    const statement = this.db.prepare("INSERT INTO memos VALUES (?)");
+    statement.run(memo).finalize();
   }
 }
