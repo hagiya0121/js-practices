@@ -10,6 +10,7 @@ class MemoDatabase {
     this.db = new sqlite3.Database("./db.sqlite");
     this.run = promisify(this.db.run.bind(this.db));
     this.all = promisify(this.db.all.bind(this.db));
+    this.prepare = promisify(this.db.prepare.bind(this.db));
   }
 
   async createTable() {
@@ -18,7 +19,7 @@ class MemoDatabase {
 
   async add(memo) {
     const statement = this.db.prepare("INSERT INTO memos VALUES (?)");
-    statement.run(memo).finalize();
+    await statement.run(memo).finalize();
   }
 
   async list() {
@@ -37,10 +38,12 @@ class MemoApp {
       output: process.stdout,
     });
     const db = new MemoDatabase();
+    await db.createTable();
 
-    if (args.l) {
+    if (this.args.l) {
       const memos = await db.list();
-      console.log(memos);
+      memos.map((memo) => console.log(memo.content.split("\n")[0]));
+      process.exit(0);
     } else {
       let lines = [];
       rl.on("line", (input) => {
@@ -49,7 +52,6 @@ class MemoApp {
 
       rl.on("close", async () => {
         const memo = lines.join("\n");
-        await db.createTable();
         db.add(memo);
       });
     }
