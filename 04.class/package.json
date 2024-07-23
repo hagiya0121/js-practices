@@ -12,6 +12,7 @@
   },
   "type": "module",
   "dependencies": {
+    "minimist": "^1.2.8",
     "sqlite3": "^5.1.7"
   }
 }
