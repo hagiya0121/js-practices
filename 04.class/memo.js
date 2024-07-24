@@ -4,6 +4,7 @@ import readline from "readline";
 import sqlite3 from "sqlite3";
 import minimist from "minimist";
 import { promisify } from "util";
+import { select } from "@inquirer/prompts";
 
 class MemoDatabase {
   constructor() {
@@ -25,6 +26,19 @@ class MemoDatabase {
   async list() {
     return await this.all("SELECT content FROM memos");
   }
+
+  async references() {
+    const memos = await this.list();
+    let choices = [];
+    memos.forEach((memo) => {
+      choices.push({
+        name: memo.content.split("\n")[0],
+        value: memo.content,
+        description: memo.content,
+      });
+    });
+    return choices;
+  }
 }
 
 class MemoApp {
@@ -44,6 +58,13 @@ class MemoApp {
       const memos = await db.list();
       memos.map((memo) => console.log(memo.content.split("\n")[0]));
       process.exit(0);
+    } else if (this.args.r) {
+      const choices = await db.references();
+      const answer = await select({
+        message: "Choose a note you want to see:",
+        choices,
+      });
+      console.log(answer);
     } else {
       let lines = [];
       rl.on("line", (input) => {
@@ -58,7 +79,7 @@ class MemoApp {
   }
 }
 const options = {
-  boolean: ["l"],
+  boolean: ["l", "r"],
 };
 const args = minimist(process.argv.slice(2), options);
 const memoApp = new MemoApp(args);
