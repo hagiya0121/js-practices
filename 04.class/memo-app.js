@@ -13,12 +13,14 @@ class MemoApp {
     const db = new MemoDatabase("./db.sqlite");
     await db.createTable();
 
+    const memos = await db.list();
     if (this.args.l) {
-      const memos = await db.list();
       MemoCLI.printTitles(memos);
     } else if (this.args.r) {
-      const memos = await db.list();
-      MemoCLI.selectMemo(memos);
+      MemoCLI.refer(memos);
+    } else if (this.args.d) {
+      const answer = await MemoCLI.delete(memos);
+      await db.delete(answer);
     } else {
       const memo = await MemoCLI.readStdin();
       db.add(memo);

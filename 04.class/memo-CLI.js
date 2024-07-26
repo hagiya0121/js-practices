@@ -21,20 +21,35 @@ export default class MemoCLI {
     memos.forEach((memo) => console.log(memo.content.split("\n")[0]));
   }
 
-  static async selectMemo(memos) {
-    let memoChoices = [];
+  static async #select(memos) {
+    let choices = [];
     memos.forEach((memo) => {
-      memoChoices.push({
+      choices.push({
         name: memo.content.split("\n")[0],
-        value: memo.content,
+        value: memo,
         description: memo.content,
       });
     });
+    return choices;
+  }
+
+  static async refer(memos) {
+    const choices = await this.#select(memos);
 
     const answer = await select({
-      message: "Choose a note you want to see:",
-      choices: memoChoices,
+      message: "Choose a memo you want to see:",
+      choices: choices,
     });
-    console.log(answer);
+    console.log(answer.content);
+  }
+
+  static async delete(memos) {
+    const choices = await this.#select(memos);
+
+    const answer = await select({
+      message: "Choose a memo you want to delete:",
+      choices: choices,
+    });
+    return answer.id;
   }
 }

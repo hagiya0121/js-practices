@@ -10,15 +10,24 @@ export default class MemoDatabase {
   }
 
   async createTable() {
-    await this.run("CREATE TABLE IF NOT EXISTS memos (content TEXT)");
+    await this.run(
+      "CREATE TABLE IF NOT EXISTS memos (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)",
+    );
   }
 
   async add(memo) {
-    const statement = await this.db.prepare("INSERT INTO memos VALUES (?)");
+    const statement = await this.db.prepare(
+      "INSERT INTO memos (content) VALUES (?)",
+    );
     await statement.run(memo).finalize();
   }
 
   async list() {
-    return await this.all("SELECT content FROM memos");
+    return await this.all("SELECT id, content FROM memos");
+  }
+
+  async delete(id) {
+    const statement = await this.db.prepare("DELETE FROM memos WHERE id = ?;");
+    await statement.run(id).finalize();
   }
 }
