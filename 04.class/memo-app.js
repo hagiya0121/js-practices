@@ -9,24 +9,31 @@ class MemoApp {
     this.args = args;
   }
 
-  async main() {
+  async run() {
     const db = new MemoDatabase("./db.sqlite");
     await db.createTable();
 
-    const memos = await db.list();
-    if (this.args.l) {
-      MemoCLI.printTitles(memos);
-    } else if (this.args.r) {
-      MemoCLI.refer(memos);
-    } else if (this.args.d) {
-      const answer = await MemoCLI.delete(memos);
-      await db.delete(answer);
+    const allMemos = await db.list();
+    if (this.args.list) {
+      MemoCLI.printTitles(allMemos);
+    } else if (this.args.refer) {
+      MemoCLI.selectMemoToRefer(allMemos);
+    } else if (this.args.delete) {
+      const memoID = await MemoCLI.selectMemoToDelete(allMemos);
+      await db.delete(memoID);
     } else {
-      const memo = await MemoCLI.readStdin();
-      db.add(memo);
+      const newMemo = await MemoCLI.readStdin();
+      db.add(newMemo);
     }
   }
 }
-const args = minimist(process.argv.slice(2));
+
+const args = minimist(process.argv.slice(2), {
+  alias: {
+    l: "list",
+    r: "refer",
+    d: "delete",
+  },
+});
 const memoApp = new MemoApp(args);
-memoApp.main();
+memoApp.run();

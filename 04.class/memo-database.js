@@ -2,11 +2,10 @@ import sqlite3 from "sqlite3";
 import { promisify } from "util";
 
 export default class MemoDatabase {
-  constructor(file_path) {
-    this.db = new sqlite3.Database(file_path);
+  constructor(filePath) {
+    this.db = new sqlite3.Database(filePath);
     this.run = promisify(this.db.run.bind(this.db));
     this.all = promisify(this.db.all.bind(this.db));
-    this.prepare = promisify(this.db.prepare.bind(this.db));
   }
 
   async createTable() {
@@ -16,10 +15,7 @@ export default class MemoDatabase {
   }
 
   async add(memo) {
-    const statement = await this.db.prepare(
-      "INSERT INTO memos (content) VALUES (?)",
-    );
-    await statement.run(memo).finalize();
+    this.run("INSERT INTO memos (content) VALUES (?)", memo);
   }
 
   async list() {
@@ -27,7 +23,6 @@ export default class MemoDatabase {
   }
 
   async delete(id) {
-    const statement = await this.db.prepare("DELETE FROM memos WHERE id = ?;");
-    await statement.run(id).finalize();
+    this.run("DELETE FROM memos WHERE id = ?;", id);
   }
 }

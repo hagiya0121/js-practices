@@ -21,7 +21,7 @@ export default class MemoCLI {
     memos.forEach((memo) => console.log(memo.content.split("\n")[0]));
   }
 
-  static async #select(memos) {
+  static async #generateSelect(memos) {
     let choices = [];
     memos.forEach((memo) => {
       choices.push({
@@ -33,8 +33,8 @@ export default class MemoCLI {
     return choices;
   }
 
-  static async refer(memos) {
-    const choices = await this.#select(memos);
+  static async selectMemoToRefer(memos) {
+    const choices = await this.#generateSelect(memos);
 
     const answer = await select({
       message: "Choose a memo you want to see:",
@@ -43,8 +43,8 @@ export default class MemoCLI {
     console.log(answer.content);
   }
 
-  static async delete(memos) {
-    const choices = await this.#select(memos);
+  static async selectMemoToDelete(memos) {
+    const choices = await this.#generateSelect(memos);
 
     const answer = await select({
       message: "Choose a memo you want to delete:",
