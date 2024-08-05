@@ -17,14 +17,15 @@ export default class MemoCLI {
     return lines.join("\n");
   }
 
-  static #validateMemos(memos) {
+  static #ensureMemosExist(memos) {
     if (memos.length === 0) {
-      throw new Error("メモが存在しません");
+      console.log("メモが存在しません");
+      process.exit(1);
     }
   }
 
   static printTitles(memos) {
-    this.#validateMemos(memos);
+    this.#ensureMemosExist(memos);
     memos.forEach((memo) => console.log(memo.content.split("\n")[0]));
   }
 
@@ -41,7 +42,7 @@ export default class MemoCLI {
   }
 
   static async selectMemoToRefer(memos) {
-    this.#validateMemos(memos);
+    this.#ensureMemosExist(memos);
     const choices = await this.#generateSelect(memos);
 
     const answer = await select({
@@ -52,7 +53,7 @@ export default class MemoCLI {
   }
 
   static async selectMemoToDelete(memos) {
-    this.#validateMemos(memos);
+    this.#ensureMemosExist(memos);
     const choices = await this.#generateSelect(memos);
 
     const answer = await select({
