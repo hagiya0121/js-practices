@@ -3,6 +3,7 @@ import timers from "timers/promises";
 
 const db = new sqlite3.Database(":memory:");
 
+// エラーなし
 db.run_promise = function (query, params = []) {
   return new Promise((resolve) => {
     db.run(query, params, function () {
@@ -42,6 +43,7 @@ db.run_promise(
 
 await timers.setTimeout(100);
 
+// エラーあり
 db.run_promise = function (query, params = []) {
   return new Promise((resolve, reject) => {
     db.run(query, params, function (err) {

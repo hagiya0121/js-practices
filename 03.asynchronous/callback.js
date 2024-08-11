@@ -3,6 +3,7 @@ import timers from "timers/promises";
 
 const db = new sqlite3.Database(":memory:");
 
+// エラーなし
 db.run(
   "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
   () => {
@@ -18,6 +19,7 @@ db.run(
 
 await timers.setTimeout(100);
 
+// エラーあり
 db.run(
   "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
   () => {
