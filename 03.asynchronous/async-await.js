@@ -44,7 +44,9 @@ await timers.setTimeout(100);
 db.run_promise = function (query, params = []) {
   return new Promise((resolve, reject) => {
     db.run(query, params, function (err) {
-      err && reject(err);
+      if (err) {
+        reject(err);
+      }
       resolve(this);
     });
   });
@@ -53,7 +55,9 @@ db.run_promise = function (query, params = []) {
 db.get_promise = function (query, params = []) {
   return new Promise((resolve, reject) => {
     db.get(query, params, function (err, row) {
-      err && reject(err);
+      if (err) {
+        reject(err);
+      }
       resolve(row);
     });
   });
@@ -67,14 +71,14 @@ async function run2() {
     await db.run_promise("INSERT INTO books (title) VALUES (?)", null);
   } catch (err) {
     if (err.code === "SQLITE_CONSTRAINT") {
-      console.log(err);
+      console.error(err.message);
     }
   }
   try {
     await db.get_promise("SELECT tittle FROM books WHERE id = ?", 1);
   } catch (err) {
     if (err.code === "SQLITE_ERROR") {
-      console.log(err);
+      console.error(err.message);
     }
   }
   db.run("DROP TABLE books");
