@@ -1,7 +1,7 @@
 import { runPromise, getPromise } from "./promisifyDB.js";
 
 // エラーなし
-async function run() {
+async function main() {
   await runPromise(
     "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
   );
@@ -15,12 +15,9 @@ async function run() {
     result.lastID,
   );
   console.log(row.title);
-  runPromise("DROP TABLE books");
-}
-run();
+  await runPromise("DROP TABLE books");
 
-// エラーあり
-async function run2() {
+  // エラーあり
   try {
     await runPromise(
       "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
@@ -38,6 +35,6 @@ async function run2() {
       console.error(err.message);
     }
   }
-  runPromise("DROP TABLE books");
+  await runPromise("DROP TABLE books");
 }
-run2();
+main();
