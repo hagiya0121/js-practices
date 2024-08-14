@@ -1,71 +1,39 @@
-import sqlite3 from "sqlite3";
-import timers from "timers/promises";
-
-const db = new sqlite3.Database(":memory:");
-
-function runPromise(db, query, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(query, params, function (err) {
-      if (err) {
-        return reject(err);
-      }
-      resolve(this);
-    });
-  });
-}
-
-function getPromise(db, query, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(query, params, function (err, row) {
-      if (err) {
-        return reject(err);
-      }
-      resolve(row);
-    });
-  });
-}
+import { runPromise, getPromise } from "./promisifyDB.js";
 
 // エラーなし
 runPromise(
-  db,
   "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
 )
   .then(() => {
-    return runPromise(db, "INSERT INTO books (title) VALUES (?)", "New Record");
+    return runPromise("INSERT INTO books (title) VALUES (?)", "New Record");
   })
   .then((result) => {
     console.log(result.lastID);
     return result;
   })
   .then((result) => {
-    return getPromise(
-      db,
-      "SELECT title FROM books WHERE id = ?",
-      result.lastID,
-    );
+    return getPromise("SELECT title FROM books WHERE id = ?", result.lastID);
   })
   .then((row) => {
     console.log(row.title);
-    db.run("DROP TABLE books");
-  });
-
-await timers.setTimeout(100);
-
-// エラーあり
-runPromise(
-  db,
-  "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
-)
+    return runPromise("DROP TABLE books");
+  })
+  // エラーあり
   .then(() => {
-    return runPromise(db, "INSERT INTO books (title) VALUES (?)", null);
+    runPromise(
+      "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
+    );
+  })
+  .then(() => {
+    return runPromise("INSERT INTO books (title) VALUES (?)", null);
   })
   .catch((err) => {
     console.error(err.message);
   })
   .then(() => {
-    return getPromise(db, "SELECT tittle FROM books WHERE id = ?", 1);
+    return getPromise("SELECT tittle FROM books WHERE id = ?", 1);
   })
   .catch((err) => {
     console.error(err.message);
-    db.run("DROP TABLE books");
+    runPromise("DROP TABLE books");
   });
