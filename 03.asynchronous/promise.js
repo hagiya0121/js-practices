@@ -7,11 +7,8 @@ runPromise(
   .then(() => runPromise("INSERT INTO books (title) VALUES (?)", "New Record"))
   .then((result) => {
     console.log(result.lastID);
-    return result;
+    return getPromise("SELECT title FROM books WHERE id = ?", result.lastID);
   })
-  .then((result) =>
-    getPromise("SELECT title FROM books WHERE id = ?", result.lastID),
-  )
   .then((row) => {
     console.log(row.title);
     return runPromise("DROP TABLE books");
@@ -23,8 +20,10 @@ runPromise(
     ),
   )
   .then(() => runPromise("INSERT INTO books (title) VALUES (?)", null))
-  .catch((err) => console.error(err.message))
-  .then(() => getPromise("SELECT tittle FROM books WHERE id = ?", 1))
+  .catch((err) => {
+    console.error(err.message);
+    return getPromise("SELECT tittle FROM books WHERE id = ?", 1);
+  })
   .catch((err) => {
     console.error(err.message);
     runPromise("DROP TABLE books");
