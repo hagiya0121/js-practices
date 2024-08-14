@@ -3,35 +3,43 @@ import timers from "timers/promises";
 
 const db = new sqlite3.Database(":memory:");
 
-// エラーなし
-db.run_promise = function (query, params = []) {
-  return new Promise((resolve) => {
-    db.run(query, params, function () {
+function runPromise(db, query, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(query, params, function (err) {
+      if (err) {
+        return reject(err);
+      }
       resolve(this);
     });
   });
-};
+}
 
-db.get_promise = function (query, params = []) {
-  return new Promise((resolve) => {
-    db.get(query, params, function (_, row) {
+function getPromise(db, query, params = []) {
+  return new Promise((resolve, reject) => {
+    db.get(query, params, function (err, row) {
+      if (err) {
+        return reject(err);
+      }
       resolve(row);
     });
   });
-};
+}
 
-db.run_promise(
+// エラーなし
+runPromise(
+  db,
   "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
 )
   .then(() => {
-    return db.run_promise("INSERT INTO books (title) VALUES (?)", "New Record");
+    return runPromise(db, "INSERT INTO books (title) VALUES (?)", "New Record");
   })
   .then((result) => {
     console.log(result.lastID);
     return result;
   })
   .then((result) => {
-    return db.get_promise(
+    return getPromise(
+      db,
       "SELECT title FROM books WHERE id = ?",
       result.lastID,
     );
@@ -44,39 +52,18 @@ db.run_promise(
 await timers.setTimeout(100);
 
 // エラーあり
-db.run_promise = function (query, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(query, params, function (err) {
-      if (err) {
-        return reject(err);
-      }
-      resolve(this);
-    });
-  });
-};
-
-db.get_promise = function (query, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(query, params, function (err, row) {
-      if (err) {
-        return reject(err);
-      }
-      resolve(row);
-    });
-  });
-};
-
-db.run_promise(
+runPromise(
+  db,
   "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
 )
   .then(() => {
-    return db.run_promise("INSERT INTO books (title) VALUES (?)", null);
+    return runPromise(db, "INSERT INTO books (title) VALUES (?)", null);
   })
   .catch((err) => {
     console.error(err.message);
   })
   .then(() => {
-    return db.get_promise("SELECT tittle FROM books WHERE id = ?", 1);
+    return getPromise(db, "SELECT tittle FROM books WHERE id = ?", 1);
   })
   .catch((err) => {
     console.error(err.message);
