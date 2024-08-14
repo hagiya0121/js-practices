@@ -4,35 +4,27 @@ import { runPromise, getPromise } from "./promisifyDB.js";
 runPromise(
   "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
 )
-  .then(() => {
-    return runPromise("INSERT INTO books (title) VALUES (?)", "New Record");
-  })
+  .then(() => runPromise("INSERT INTO books (title) VALUES (?)", "New Record"))
   .then((result) => {
     console.log(result.lastID);
     return result;
   })
-  .then((result) => {
-    return getPromise("SELECT title FROM books WHERE id = ?", result.lastID);
-  })
+  .then((result) =>
+    getPromise("SELECT title FROM books WHERE id = ?", result.lastID),
+  )
   .then((row) => {
     console.log(row.title);
     return runPromise("DROP TABLE books");
   })
   // エラーあり
-  .then(() => {
+  .then(() =>
     runPromise(
       "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
-    );
-  })
-  .then(() => {
-    return runPromise("INSERT INTO books (title) VALUES (?)", null);
-  })
-  .catch((err) => {
-    console.error(err.message);
-  })
-  .then(() => {
-    return getPromise("SELECT tittle FROM books WHERE id = ?", 1);
-  })
+    ),
+  )
+  .then(() => runPromise("INSERT INTO books (title) VALUES (?)", null))
+  .catch((err) => console.error(err.message))
+  .then(() => getPromise("SELECT tittle FROM books WHERE id = ?", 1))
   .catch((err) => {
     console.error(err.message);
     runPromise("DROP TABLE books");
