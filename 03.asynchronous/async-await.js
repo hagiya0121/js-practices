@@ -24,15 +24,19 @@ async function main() {
     );
     await runPromise("INSERT INTO books (title) VALUES (?)", null);
   } catch (err) {
-    if (err.code === "SQLITE_CONSTRAINT") {
+    if (err?.code === "SQLITE_CONSTRAINT") {
       console.error(err.message);
+    } else {
+      throw err;
     }
   }
   try {
     await getPromise("SELECT tittle FROM books WHERE id = ?", 1);
   } catch (err) {
-    if (err.code === "SQLITE_ERROR") {
+    if (err?.code === "SQLITE_ERROR") {
       console.error(err.message);
+    } else {
+      throw err;
     }
   }
   await runPromise("DROP TABLE books");
