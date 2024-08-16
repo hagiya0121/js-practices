@@ -1,4 +1,4 @@
-import { runPromise, getPromise } from "./promisifyDB.js";
+import { runPromise, getPromise } from "./db-promise.js";
 
 // エラーなし
 runPromise(
