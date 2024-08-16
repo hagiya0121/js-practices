@@ -6,7 +6,7 @@ export function runPromise(query, params = []) {
   return new Promise((resolve, reject) => {
     db.run(query, params, function (err) {
       if (err) {
-        return reject(err);
+        reject(err);
       }
       resolve(this);
     });
@@ -17,7 +17,7 @@ export function getPromise(query, params = []) {
   return new Promise((resolve, reject) => {
     db.get(query, params, function (err, row) {
       if (err) {
-        return reject(err);
+        reject(err);
       }
       resolve(row);
     });
