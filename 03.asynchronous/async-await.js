@@ -23,11 +23,11 @@ console.log(row.title);
 await runPromise(db, "DROP TABLE books");
 
 // エラーあり
+await runPromise(
+  db,
+  "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
+);
 try {
-  await runPromise(
-    db,
-    "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
-  );
   await runPromise(db, "INSERT INTO books (title) VALUES (?)", null);
 } catch (err) {
   if (err?.code === "SQLITE_CONSTRAINT") {
