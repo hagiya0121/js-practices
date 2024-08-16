@@ -1,30 +1,41 @@
+import sqlite3 from "sqlite3";
 import { runPromise, getPromise } from "./db-promise.js";
+
+const db = new sqlite3.Database(":memory:");
 
 // エラーなし
 runPromise(
+  db,
   "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
 )
-  .then(() => runPromise("INSERT INTO books (title) VALUES (?)", "New Record"))
+  .then(() =>
+    runPromise(db, "INSERT INTO books (title) VALUES (?)", "New Record"),
+  )
   .then((result) => {
     console.log(result.lastID);
-    return getPromise("SELECT title FROM books WHERE id = ?", result.lastID);
+    return getPromise(
+      db,
+      "SELECT title FROM books WHERE id = ?",
+      result.lastID,
+    );
   })
   .then((row) => {
     console.log(row.title);
-    return runPromise("DROP TABLE books");
+    return runPromise(db, "DROP TABLE books");
   })
   // エラーあり
   .then(() =>
     runPromise(
+      db,
       "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
     ),
   )
-  .then(() => runPromise("INSERT INTO books (title) VALUES (?)", null))
+  .then(() => runPromise(db, "INSERT INTO books (title) VALUES (?)", null))
   .catch((err) => {
     console.error(err.message);
-    return getPromise("SELECT tittle FROM books WHERE id = ?", 1);
+    return getPromise(db, "SELECT tittle FROM books WHERE id = ?", 1);
   })
   .catch((err) => {
     console.error(err.message);
-    runPromise("DROP TABLE books");
+    runPromise(db, "DROP TABLE books");
   });
