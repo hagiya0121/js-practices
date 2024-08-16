@@ -15,5 +15,5 @@ runPromise(
   })
   .catch((err) => {
     console.error(err.message);
-    runPromise(db, "DROP TABLE books");
+    return runPromise(db, "DROP TABLE books");
   });
