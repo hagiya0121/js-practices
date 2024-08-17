@@ -3,8 +3,9 @@ export function runPromise(db, query, params = []) {
     db.run(query, params, function (err) {
       if (err) {
         reject(err);
+      } else {
+        resolve(this);
       }
-      resolve(this);
     });
   });
 }
@@ -14,8 +15,9 @@ export function getPromise(db, query, params = []) {
     db.get(query, params, function (err, row) {
       if (err) {
         reject(err);
+      } else {
+        resolve(row);
       }
-      resolve(row);
     });
   });
 }
