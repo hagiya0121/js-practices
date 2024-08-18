@@ -23,7 +23,7 @@ await timers.setTimeout(100);
 db.run(
   "CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE)",
   () => {
-    db.run("INSERT INTO books (title) VALUES (?)", null, function (err) {
+    db.run("INSERT INTO books (title) VALUES (?)", null, (err) => {
       console.error(err.message);
       db.get("SELECT content FROM books WHERE id = ?", 2, (err) => {
         console.error(err.message);
